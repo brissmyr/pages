@@ -8,6 +8,49 @@
     <meta name="generator" content="Jekyll v3.8.5">
     <title>Cover Template · Bootstrap</title>
 
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js'></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js'></script>
+    <script src='https://www.google.com/recaptcha/api.js'></script>
+
+    <script>
+
+      var token;
+      const api = 'http://localhost.charlesproxy.com:9292'
+
+      function poll () {
+        const params = {
+          t: token
+        }
+        $.get(api + '/v0/check', params, function(data) {
+          if (data.confirmed) {
+            $('#waiting').html('<a href="/?challenge_succeeded=1" class="btn btn-lg btn-secondary">Continue</a>')
+          }
+        });
+        setTimeout(poll, 1000);
+
+      }
+
+      $(function(){
+        const params = {
+          device_token: $.cookie('castle_device_token')
+        }
+        $.post(api + '/v0/request', params, function(data) {
+          token = data.token
+          poll();
+        });
+      });
+
+      function recaptchaCallback(response) {
+        const params = {
+          recaptcha: response,
+          device_token: $.cookie('castle_device_token')
+        }
+        $.post(api + '/v0/verify', params, function(data) {
+          window.location.href = '/?device_token=' + data.device_token;
+        });
+      }
+    </script>
+
     <!-- Bootstrap core CSS -->
 <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
     <style>
@@ -30,7 +73,7 @@
       a,
       a:focus,
       a:hover {
-        color: #fff;
+        color: #000;
       }
 
       /* Custom default button */
@@ -57,10 +100,8 @@
       body {
         display: -ms-flexbox;
         display: flex;
-        color: #fff;
-        text-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        background-color: #8EC5FC;
-        background-image: linear-gradient(62deg, #8EC5FC 0%, #E0C3FC 100%);
+        color: #000;
+        background-color: #fff;
       }
 
       .cover-container {
@@ -119,7 +160,8 @@
       }
       .cover .btn-lg {
         border-radius: 100px;
-        color: #8596ca;
+        border: 2px solid #000;
+        /*color: #8596ca;*/
         font-size: 20px;
         margin-top: 20px;
         padding: .75rem 1.75rem;
@@ -129,8 +171,13 @@
        * Footer
        */
       .mastfoot {
-        color: rgba(255, 255, 255, .5);
+        /*color: rgba(255, 255, 255, .5);*/
       }
+
+      .g-recaptcha > div {
+        margin: auto;
+      }
+
     </style>
     <!-- Custom styles for this template -->
     <link href="cover.css" rel="stylesheet">
@@ -151,10 +198,16 @@
   </header>
 
   <main role="main" class="inner cover">
-    <h1 class="cover-heading">Are you human?</h1>
-    <p class="lead">Please click below to continue.</p>
-    <p class="lead">
-      <a href="/?challenge_succeeded=1" class="btn btn-lg btn-secondary">Yes, I'm human</a>
+    <h1 class="cover-heading">Is this really you?</h1>
+    <p class="lead">Looks like there's something unusual about this session. To verify your identity, please click the link in the email we just sent you.</p>
+<!--
+    <p>
+      <div class="g-recaptcha" data-sitekey="6LfGmoUUAAAAAEJPjSmMR6QyxAwRLI0zZs32nGyG" data-callback="recaptchaCallback"></div>
+    </p>
+-->
+    <p id="waiting" class="lead">
+      Waiting...
+      <!-- <a href="/?challenge_succeeded=1" class="btn btn-lg btn-secondary">Yes, I'm human</a> -->
     </p>
   </main>
 
