@@ -15,7 +15,8 @@
     <script>
 
       var token;
-      const api = 'http://localhost.charlesproxy.com:9292'
+      // const api = 'http://localhost.charlesproxy.com:9292'
+      const api = 'http://verify.castlete.st'
 
       function poll () {
         const params = {
@@ -24,10 +25,10 @@
         $.get(api + '/v0/check', params, function(data) {
           if (data.confirmed) {
             $('#waiting').html('<a href="/?challenge_succeeded=1" class="btn btn-lg btn-secondary">Continue</a>')
+          } else {
+            setTimeout(poll, 1000);
           }
         });
-        setTimeout(poll, 1000);
-
       }
 
       $(function(){
