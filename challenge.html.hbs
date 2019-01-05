@@ -13,7 +13,8 @@
 
     <script>
 
-      var token;
+      var token = $('meta[name=castle_token]').attr("content");
+
       // const api = 'http://localhost.charlesproxy.com:9292'
       const api = 'https://verify.castlete.st'
 
@@ -30,15 +31,7 @@
         });
       }
 
-      $(function(){
-        const params = {
-          device_token: $('meta[name=castle_token]').attr("content")
-        }
-        $.post(api + '/v0/request', params, function(data) {
-          token = data.token
-          poll();
-        });
-      });
+      poll();
 
       function recaptchaCallback(response) {
         const params = {
