@@ -7,5 +7,4 @@ Please confirm this was you by clicking on the link below:
 If this was not you, please let us know immediately by replying to this email.
 
 Yours,
-
 The {{app.name}} team

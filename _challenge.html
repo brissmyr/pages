@@ -1,5 +1,47 @@
+<script>
+  window.Auth = function(){
+    // const api = 'http://localhost.charlesproxy.com:9292'
+    const api = 'https://verify.castlete.st'
+
+    const verificationToken = $('meta[name=castle_verification_token]').attr('content');
+    const redirectData = $('meta[name=castle_redirect_data]').attr('content');
+
+    const obj = {
+      verificationToken: verificationToken,
+      redirectData: redirectData,
+      callback: null
+    }
+
+    function poll () {
+      const params = {
+        verification_token: verificationToken
+      }
+      $.get(api + '/v0/check', params, function(data) {
+        if (data.confirmed) {
+          $('.castle-continue').prop({href: '/?_ct=' + redirectData})
+          if (obj.callback) {
+            obj.callback()
+          }
+        } else {
+          setTimeout(poll, 1000);
+        }
+      });
+    }
+    poll();
+
+    return obj
+  }();
+</script>
+
+<script>
+  Auth.callback = function() {
+    $('#waiting').hide();
+    $('.castle-continue').show();
+    $('.castle-continue').html('<a href="/?_crd=' + Auth.redirectData + '" class="btn btn-lg btn-secondary">Yes, it\'s me. Continue!</a>')
+  }
+</script>
+
 <h1 class="cover-heading">Is this you?</h1>
 <p class="lead">We noticed something different about this session and sent a login request to <b>{{email}}</b>. Please <b>click the link in the email</b> to continue the session.</p>
-<p id="waiting" class="lead">
-  <div class="lds-ring"><div></div><div></div><div></div><div></div></div>
-</p>
+<div id="waiting" class="lds-ring"><div></div><div></div><div></div><div></div></div>
+<p class="castle-continue" style="display:none;"></p>
