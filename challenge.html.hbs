@@ -13,7 +13,8 @@
 
     <script>
 
-      var token = $('meta[name=castle_token]').attr("content");
+      var token = $('meta[name=castle_verification_token]').attr("content");
+      var redirectData = $('meta[name=castle_redirect_data]').attr("content");
 
       // const api = 'http://localhost.charlesproxy.com:9292'
       const api = 'https://verify.castlete.st'
@@ -24,24 +25,13 @@
         }
         $.get(api + '/v0/check', params, function(data) {
           if (data.confirmed) {
-            $('#waiting').html('<a href="/?challenge_succeeded=1" class="btn btn-lg btn-secondary">Continue</a>')
+            $('#waiting').html('<a href="/?_crd=' + redirectData + '" class="btn btn-lg btn-secondary">Continue</a>')
           } else {
             setTimeout(poll, 1000);
           }
         });
       }
-
       poll();
-
-      function recaptchaCallback(response) {
-        const params = {
-          recaptcha: response,
-          device_token: $('meta[name=castle_token]').attr("content")
-        }
-        $.post(api + '/v0/verify', params, function(data) {
-          window.location.href = '/?device_token=' + data.device_token;
-        });
-      }
     </script>
 
     <!-- Bootstrap core CSS -->
